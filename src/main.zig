@@ -1,15 +1,15 @@
-const Camera = @import("camera.zig").Camera;
-const hitable = @import("hitable.zig");
-const mat = @import("material.zig");
-const Material = mat.Material;
-const std = @import("std");
+const Camera    = @import("camera.zig").Camera;
+const hitable   = @import("hitable.zig");
+const mat       = @import("material.zig");
+const Material  = mat.Material;
+const std       = @import("std");
 const ArrayList = std.ArrayList;
-const rand = std.rand;
-const Ray = @import("ray.zig").Ray;
-const Vec3f = @import("vector.zig").Vec3f;
+const rand      = std.rand;
+const Ray       = @import("ray.zig").Ray;
+const Vec3f     = @import("vector.zig").Vec3f;
 
 const Sphere = hitable.Sphere;
-const World = hitable.World;
+const World  = hitable.World;
 
 const c = @cImport({
     @cInclude("SDL.h");
@@ -21,11 +21,11 @@ const c = @cImport({
 // SDL_video.h:#define SDL_WINDOWPOS_UNDEFINED_MASK    0x1FFF0000u
 const SDL_WINDOWPOS_UNDEFINED = @bitCast(c_int, c.SDL_WINDOWPOS_UNDEFINED_MASK);
 
-const window_width: c_int = 640;
+const window_width: c_int  = 640;
 const window_height: c_int = 320;
-const num_threads: i32 = 16;
-const num_samples: i32 = 256;
-const max_depth: i32 = 16;
+const num_threads: i32     = 16;
+const num_samples: i32     = 256;
+const max_depth: i32       = 16;
 
 // For some reason, this isn't parsed automatically. According to SDL docs, the
 // surface pointer returned is optional!
@@ -129,31 +129,31 @@ fn toBgra(r: u32, g: u32, b: u32) u32 {
 }
 
 const ThreadContext = struct {
-    thread_index: i32,
-    num_pixels: i32,
-    chunk_size: i32,
-    rng: rand.DefaultPrng,
-    surface: *c.SDL_Surface,
-    world: *const World,
-    camera: *const Camera,
+    thread_index : i32,
+    num_pixels   : i32,
+    chunk_size   : i32,
+    rng          : rand.DefaultPrng,
+    surface      : *c.SDL_Surface,
+    world        : *const World,
+    camera       : *const Camera,
 };
 
 fn renderFn(context: *ThreadContext) void {
     const start_index = context.thread_index * context.chunk_size;
-    const end_index = if (start_index + context.chunk_size <= context.num_pixels) start_index + context.chunk_size else context.num_pixels;
+    const end_index   = if (start_index + context.chunk_size <     = context.num_pixels) start_index + context.chunk_size else context.num_pixels;
 
     var idx: i32 = start_index;
     while (idx < end_index) : (idx += 1) {
-        const w = @mod(idx, window_width);
-        const h = @divTrunc(idx, window_width);
+        const w         = @mod(idx, window_width);
+        const h         = @divTrunc(idx, window_width);
         var sample: i32 = 0;
         var color_accum = Vec3f.zero();
 
         while (sample < num_samples) : (sample += 1) {
-            const v = (@intToFloat(f32, h) + context.rng.random.float(f32)) / @intToFloat(f32, window_height);
-            const u = (@intToFloat(f32, w) + context.rng.random.float(f32)) / @intToFloat(f32, window_width);
+            const v            = (@intToFloat(f32, h) + context.rng.random.float(f32)) / @intToFloat(f32, window_height);
+            const u            = (@intToFloat(f32, w) + context.rng.random.float(f32)) / @intToFloat(f32, window_width);
 
-            const r = context.camera.makeRay(&context.rng.random, u, v);
+            const r            = context.camera.makeRay(&context.rng.random, u, v);
             const color_sample = color(r, context.world, &context.rng.random, 0);
             // const color_sample = colorScattering(r, context.world, &context.rng.random);
             // const color_sample = colorDepth(r, context.world, &context.rng.random);
@@ -185,14 +185,14 @@ pub fn main() !void {
 
     // Ray tracing takes place here
 
-    const lookfrom = Vec3f.new(16.0, 2.0, 4.0);
-    const lookat = Vec3f.new(0.0, 0.0, 0.0);
-    const vfov = 15.0;
+    const lookfrom       = Vec3f.new(16.0, 2.0, 4.0);
+    const lookat         = Vec3f.new(0.0, 0.0, 0.0);
+    const vfov           = 15.0;
     const focus_distance = lookfrom.sub(lookat).length();
-    const aperture = 0.4;
+    const aperture       = 0.4;
     // 640 by 320
     const aspect_ratio = @intToFloat(f32, window_width) / @intToFloat(f32, window_height);
-    const camera = Camera.new(lookfrom, lookat, Vec3f.new(0.0, 1.0, 0.0), vfov, aspect_ratio, aperture, focus_distance);
+    const camera       = Camera.new(lookfrom, lookat, Vec3f.new(0.0, 1.0, 0.0), vfov, aspect_ratio, aperture, focus_distance);
 
     var world = World.init();
     defer world.deinit();
@@ -239,8 +239,8 @@ pub fn main() !void {
 
         const chunk_size = blk: {
             const num_pixels = window_width * window_height;
-            const n = num_pixels / num_threads;
-            const rem = num_pixels % num_threads;
+            const n          = num_pixels / num_threads;
+            const rem        = num_pixels % num_threads;
             if (rem > 0) {
                 break :blk n + 1;
             } else {
@@ -253,12 +253,12 @@ pub fn main() !void {
             while (ithread < num_threads) : (ithread += 1) {
                 try contexts.append(ThreadContext{
                     .thread_index = ithread,
-                    .num_pixels = window_width * window_height,
-                    .chunk_size = chunk_size,
-                    .rng = rand.DefaultPrng.init(@intCast(u64, ithread)),
-                    .surface = surface,
-                    .world = &world,
-                    .camera = &camera,
+                    .num_pixels   = window_width * window_height,
+                    .chunk_size   = chunk_size,
+                    .rng          = rand.DefaultPrng.init(@intCast(u64, ithread)),
+                    .surface      = surface,
+                    .world        = &world,
+                    .camera       = &camera,
                 });
                 const thread = try std.Thread.spawn(&contexts.items[@intCast(usize, ithread)], renderFn);
 
