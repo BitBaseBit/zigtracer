@@ -1,3 +1,4 @@
+
 const std    = @import("std");
 const math   = std.math;
 const random = std.Rand.random;
@@ -118,4 +119,42 @@ pub fn Vec3(comptime T: type) type {
             return self.sub(n.mul(2.0 * self.dot(n)));
         }
     };
+}
+
+pub const Vec3f = Vector3(f32);
+
+const assert = @import("std").debug.assert;
+const epsilon: f32 = 0.00001;
+
+test "Vector3.add" {
+    const lhs = Vec3f.new(1.0, 2.0, 3.0);
+    const rhs = Vec3f.new(2.0, 3.0, 4.0);
+    const r = lhs.add(rhs);
+    assert(math.fabs(r.x - 3.0) < epsilon);
+    assert(math.fabs(r.y - 5.0) < epsilon);
+    assert(math.fabs(r.z - 7.0) < epsilon);
+}
+
+test "Vector3.sub" {
+    const lhs = Vec3f.new(2.0, 3.0, 4.0);
+    const rhs = Vec3f.new(2.0, 4.0, 3.0);
+    const r = lhs.sub(rhs);
+    assert(math.fabs(r.x) < epsilon);
+    assert(math.fabs(r.y + 1.0) < epsilon);
+    assert(math.fabs(r.z - 1.0) < epsilon);
+}
+
+test "Vector3.makeUnitVector" {
+    const v = Vec3f.new(1.0, 2.0, 3.0);
+    const uv = v.makeUnitVector();
+    assert(math.fabs(uv.length() - 1.0) < epsilon);
+}
+
+test "Vector3.cross" {
+    const lhs = Vec3f.new(1.0, 0.0, 2.0);
+    const rhs = Vec3f.new(2.0, 1.0, 2.0);
+    const res = lhs.cross(rhs);
+    assert(math.fabs(res.x + 2.0) < epsilon);
+    assert(math.fabs(res.y - 2.0) < epsilon);
+    assert(math.fabs(res.z - 1.0) < epsilon);
 }

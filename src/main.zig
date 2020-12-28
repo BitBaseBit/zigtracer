@@ -136,7 +136,7 @@ const ThreadContext = struct {
 
 fn renderFn(context: *ThreadContext) void {
     const start_index = context.thread_index * context.chunk_size;
-    const end_index   = if (start_index + context.chunk_size <     = context.num_pixels) start_index + context.chunk_size else context.num_pixels;
+    const end_index   = if (start_index + context.chunk_size <= context.num_pixels) start_index + context.chunk_size else context.num_pixels;
 
     var idx: i32 = start_index;
     while (idx < end_index) : (idx += 1) {
