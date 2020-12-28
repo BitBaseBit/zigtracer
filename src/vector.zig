@@ -1,7 +1,6 @@
 
-const std    = @import("std");
-const math   = std.math;
-const random = std.Rand.random;
+const math   = @import("std").math;
+const Random = @import("std").rand.Random;
 
 pub fn Vector3(comptime T: type) type {
     return packed struct {
@@ -21,17 +20,17 @@ pub fn Vector3(comptime T: type) type {
 
         pub fn zero() Self {
             return Self{
-                .x = 0,
-                .y = 0,
-                .z = 0,
+                .x = 0.0,
+                .y = 0.0,
+                .z = 0.0,
             };
         }
-        
+
         pub fn one() Self {
             return Self{
-                .x = 1,
-                .y = 1,
-                .z = 1,
+                .x = 1.0,
+                .y = 1.0,
+                .z = 1.0,
             };
         }
 
@@ -51,15 +50,15 @@ pub fn Vector3(comptime T: type) type {
             };
         }
 
-        pub fn mul(a: Self, s: T) Self {
+        pub fn mul(self: Self, s: T) Self {
             return Self{
-                .x = a.x * s,
-                .x = a.y * s,
-                .x = a.z * s,
+                .x = s * self.x,
+                .y = s * self.y,
+                .z = s * self.z,
             };
         }
 
-        pub fn elemWiseMul(lhs: Self, rhs: Self) Self {
+        pub fn elementwiseMul(lhs: Self, rhs: Self) Self {
             return Self{
                 .x = lhs.x * rhs.x,
                 .y = lhs.y * rhs.y,
@@ -67,18 +66,18 @@ pub fn Vector3(comptime T: type) type {
             };
         }
 
-        pub fn length(self: Self) T  {
-            return math.sqrt(self.x*self.x + self.y*self.y + self.z * self.z);
+        pub fn length(self: Self) T {
+            return math.sqrt(self.x * self.x + self.y * self.y + self.z * self.z);
         }
-        
-        pub fn lengthSquared(self: Self) T  {
-            return self.x*self.x + self.y*self.y + self.z * self.z;
+
+        pub fn lengthSquared(self: Self) T {
+            return self.x * self.x + self.y * self.y + self.z * self.z;
         }
 
         pub fn dot(a: Self, b: Self) T {
             return a.x * b.x + a.y * b.y + a.z * b.z;
         }
-        
+
         pub fn cross(a: Self, b: Self) Self {
             return Self{
                 .x = a.y * b.z - a.z * b.y,
