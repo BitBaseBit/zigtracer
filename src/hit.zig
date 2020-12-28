@@ -1,13 +1,13 @@
 
-const std = @import("std");
-const math = std.math;
+const std       = @import("std");
+const math      = std.math;
 const ArrayList = std.ArrayList;
-const debug = std.debug;
+const debug     = std.debug;
 
-const mat = @import("material.zig");
-const Material = @import("material.zig").Material;
-const Ray = @import("ray.zig").Ray;
-const Vec3f = @import("vector.zig").Vec3f;
+const mat      = @import("mat.zig");
+const Material = @import("mat.zig").Material;
+const Ray      = @import("ray.zig").Ray;
+const Vec3f    = @import("vector.zig").Vec3f;
 
 pub const HitRecord = struct {
     t: f32,

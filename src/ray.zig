@@ -16,8 +16,8 @@ pub const Ray = struct {
     }
 };
 
-const assert = @import("std").debug.assert;
-const math = @import("std").math;
+const assert       = @import("std").debug.assert;
+const math         = @import("std").math;
 const epsilon: f32 = 0.00001;
 
 test "Ray.pointAtParameter" {

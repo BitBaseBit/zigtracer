@@ -1,9 +1,9 @@
 
-const HitRecord = @import("hitable.zig").HitRecord;
-const math = @import("std").math;
-const Random = @import("std").rand.Random;
-const Ray = @import("ray.zig").Ray;
-const Vec3f = @import("vector.zig").Vec3f;
+const HitRecord = @import("hit.zig").HitRecord;
+const math      = @import("std").math;
+const Random    = @import("std").rand.Random;
+const Ray       = @import("ray.zig").Ray;
+const Vec3f     = @import("vector.zig").Vec3f;
 
 pub const Scatter = struct {
     attenuation: Vec3f,
@@ -33,9 +33,9 @@ pub const Metal = struct {
     fuzz: f32,
 
     pub fn scatter(self: Metal, ray: Ray, hit: HitRecord, rand: *Random) Scatter {
-        const reflected = ray.direction.reflect(hit.n.makeUnitVector());
+        const reflected   = ray.direction.reflect(hit.n.makeUnitVector());
         const attenuation = self.albedo;
-        const scattered = Ray.new(hit.p, reflected.add(Vec3f.randomInUnitSphere(rand).mul(self.fuzz)).makeUnitVector());
+        const scattered   = Ray.new(hit.p, reflected.add(Vec3f.randomInUnitSphere(rand).mul(self.fuzz)).makeUnitVector());
         return Scatter.new(attenuation, scattered);
     }
 };
@@ -43,8 +43,8 @@ pub const Metal = struct {
 fn refract(v: Vec3f, n: Vec3f, ni_over_nt: f32) ?Vec3f {
     // ni * sin(i) = nt * sin(t)
     // sint(t) = sin(i) * (ni / nt)
-    const uv = v.makeUnitVector();
-    const dt = uv.dot(n);
+    const uv           = v.makeUnitVector();
+    const dt           = uv.dot(n);
     const discriminant = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
 
     if (discriminant > 0.0) {
@@ -57,7 +57,7 @@ fn refract(v: Vec3f, n: Vec3f, ni_over_nt: f32) ?Vec3f {
 
 fn schlick(cosine: f32, refraction_index: f32) f32 {
     var r0 = (1.0 - refraction_index) / (1.0 + refraction_index);
-    r0 = r0 * r0;
+    r0     = r0 * r0;
     return r0 + (1.0 - r0) * math.pow(f32, (1.0 - cosine), 5.0);
 }
 
@@ -67,17 +67,17 @@ pub const Dielectric = struct {
     pub fn scatter(self: Dielectric, ray: Ray, hit: HitRecord, rand: *Random) Scatter {
         // If the ray direction and hit normal are in the same half-sphere
         var outward_normal: Vec3f = undefined;
-        var ni_over_nt: f32 = undefined;
-        var cosine: f32 = undefined;
+        var ni_over_nt: f32       = undefined;
+        var cosine: f32           = undefined;
 
         if (ray.direction.dot(hit.n) > 0.0) {
             outward_normal = Vec3f.new(-hit.n.x, -hit.n.y, -hit.n.z);
-            ni_over_nt = self.refraction_index;
-            cosine = self.refraction_index * ray.direction.dot(hit.n) / ray.direction.length();
+            ni_over_nt     = self.refraction_index;
+            cosine         = self.refraction_index * ray.direction.dot(hit.n) / ray.direction.length();
         } else {
             outward_normal = hit.n;
-            ni_over_nt = 1.0 / self.refraction_index;
-            cosine = -ray.direction.dot(hit.n) / ray.direction.length();
+            ni_over_nt     = 1.0 / self.refraction_index;
+            cosine         = -ray.direction.dot(hit.n) / ray.direction.length();
         }
 
         if (refract(ray.direction, outward_normal, ni_over_nt)) |refracted_dir| {

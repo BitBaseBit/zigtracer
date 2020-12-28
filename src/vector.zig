@@ -3,7 +3,7 @@ const std    = @import("std");
 const math   = std.math;
 const random = std.Rand.random;
 
-pub fn Vec3(comptime T: type) type {
+pub fn Vector3(comptime T: type) type {
     return packed struct {
         const Self = @This();
 
